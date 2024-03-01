@@ -7,7 +7,7 @@ public class BasicTurret : MonoBehaviour {
     [SerializeField] private float fireRate;
     [SerializeField] private float fireSpeed;
     [SerializeField] private Transform bulletOrigin;
-    [SerializeField] private Rigidbody bulletPrefab;
+    [SerializeField] private BulletPool bulletPool;
 
     private float fireTimer;
     private Transform target;
@@ -22,7 +22,7 @@ public class BasicTurret : MonoBehaviour {
 
         if (fireTimer > fireRate) {
             fireTimer = 0;
-            Instantiate(bulletPrefab, bulletOrigin.position, Quaternion.identity).velocity = (target.position - bulletOrigin.position).normalized * fireSpeed;
+            bulletPool.Spawn(bulletOrigin.position).Velocity = (target.position - bulletOrigin.position).normalized * fireSpeed;
         }
     }
 }

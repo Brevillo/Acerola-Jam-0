@@ -26,6 +26,8 @@ public class TrailManager : MonoBehaviour {
 
     private Transform target;
 
+    public static bool showDebugTrail;
+
     private void Start() {
         target = FindObjectOfType<Player>().transform;   
     }
@@ -78,26 +80,26 @@ public class TrailManager : MonoBehaviour {
         Gizmos.color = gizmoColor;
         Gizmos.DrawLineStrip(new(points.ToArray()), false);
 
-        if (debugLineInner != null && debugLineOuter != null) {
 
-            var linePoints = points
-                .ConvertAll(point => Physics.Raycast(point, Vector3.down, out var hit, Mathf.Infinity, GameInfo.GroundMask) ? hit.point + Vector3.up * debugLineHeight : point)
-                .ToArray();
+        var linePoints = points
+            .ConvertAll(point => Physics.Raycast(point, Vector3.down, out var hit, Mathf.Infinity, GameInfo.GroundMask) ? hit.point + Vector3.up * debugLineHeight : point)
+            .ToArray();
 
-            SetupLine(debugLineInner, trailFadeWidth);
-            SetupLine(debugLineOuter, 0);
+        if (debugLineInner != null) SetupLine(debugLineInner, trailFadeWidth);
+        if (debugLineOuter != null) SetupLine(debugLineOuter, 0);
 
-            void SetupLine(LineRenderer line, float widthSub) {
+        void SetupLine(LineRenderer line, float widthSub) {
 
-                line.positionCount = points.Count;
-                line.SetPositions(linePoints);
+            line.enabled = showDebugTrail;
 
-                var frames = new Keyframe[members.Count];
-                for (int i = 0; i < members.Count; i++)
-                    frames[i] = new((float)i / members.Count, members[i].Width - widthSub);
+            line.positionCount = points.Count;
+            line.SetPositions(linePoints);
 
-                line.widthCurve = new(frames);
-            }
+            var frames = new Keyframe[members.Count];
+            for (int i = 0; i < members.Count; i++)
+                frames[i] = new((float)i / members.Count, members[i].Width - widthSub);
+
+            line.widthCurve = new(frames);
         }
     }
 

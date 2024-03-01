@@ -2,13 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicBullet : MonoBehaviour {
+public class BasicBullet : IBullet {
 
     [SerializeField] private float damage;
     [SerializeField] private float lifetime;
 
-    private void Start() {
-        Destroy(gameObject, lifetime);
+    private float lifetimer;
+
+    private void Update() {
+
+        lifetimer += Time.deltaTime;
+
+        if (lifetimer > lifetime) Destroy();
     }
 
     private void OnTriggerEnter(Collider other) {
@@ -19,10 +24,10 @@ public class BasicBullet : MonoBehaviour {
                 damage = damage
             });
 
-            Destroy(gameObject);
+            Destroy();
         }
 
         else if (other.gameObject.layer == GameInfo.GroundLayer)
-            Destroy(gameObject);
+            Destroy();
     }
 }

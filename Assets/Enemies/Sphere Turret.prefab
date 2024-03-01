@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 66256495739347634}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -51,8 +51,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.75
-  m_Height: 3.5
+  m_Radius: 1.5
+  m_Height: 6
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &508842335781027350
@@ -82,8 +82,8 @@ Transform:
   m_GameObject: {fileID: 508842335781027350}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.5, z: 0}
-  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
+  m_LocalPosition: {x: 0, y: 4.5, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4990520769487274930}
@@ -147,9 +147,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5216871310467539659}
-  - component: {fileID: -9189119145861001038}
+  - component: {fileID: 5155484389969244383}
   m_Layer: 0
-  m_Name: Turret
+  m_Name: Sphere Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -173,7 +173,7 @@ Transform:
   - {fileID: 7467245071959065602}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-9189119145861001038
+--- !u!114 &5155484389969244383
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,14 +182,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1362877186699420738}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1080f7e1db7440938e8bc3f72c263c1, type: 3}
+  m_Script: {fileID: 11500000, guid: 0102ed175f4d141e694b0c92ab8bad37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 0.1
+  fireRate: 2
   fireSpeed: 5
+  bulletsPerAxis: 10
   bulletOrigin: {fileID: 7946599574637651129}
-  bulletPrefab: {fileID: 8716199717548299221, guid: ad46a97161bdd4b03985bdeebca27a61,
-    type: 3}
+  bulletPool: {fileID: 11400000, guid: 14bca635c57e7492ea28c6337296e110, type: 2}
 --- !u!1 &3223947054756901180
 GameObject:
   m_ObjectHideFlags: 0
@@ -217,8 +217,8 @@ Transform:
   m_GameObject: {fileID: 3223947054756901180}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalScale: {x: 1, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4990520769487274930}
@@ -332,7 +332,7 @@ Transform:
   m_GameObject: {fileID: 8803174852165651601}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 2.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -358,6 +358,6 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 3
+  m_Height: 5.5
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}

@@ -11,4 +11,7 @@ public class PlayerInput : InputManager {
     public Button Dash;
     public Axis Movement;
     public Axis Looking;
+
+    [Header("Debuggin")]
+    public Button Debug;
 }
