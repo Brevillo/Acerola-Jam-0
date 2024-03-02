@@ -1,55 +1,74 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 
 [CreateAssetMenu]
 public class BulletPool : ScriptableObject {
 
-    [SerializeField] private IBullet bulletPrefab;
+    [SerializeField] private float damage;
+    [SerializeField] private float radius;
+    [SerializeField] private float lifetime;
+    [SerializeField] private Material bulletMaterial;
+    [SerializeField] private Mesh bulletMesh;
+    [SerializeField] private bool sort;
 
-    private ObjectPool<IBullet> pool;
-    private Transform heirarchyFolder;
+    private struct Bullet {
 
-    public IBullet Spawn(Vector3 position) {
-
-        if (pool == null) Initialize();
-
-        var bullet = pool.Get();
-
-        bullet.Position = position;
-        bullet.gameObject.SetActive(true);
-
-        return bullet;
+        public Vector3 position;
+        public Vector3 velocity;
+        public float lifetime;
+        
+        public Bullet(Vector3 position, Vector3 velocity, float lifetime) {
+            this.position = position;
+            this.velocity = velocity;
+            this.lifetime = lifetime;
+        }
     }
 
-    public void Destroy(IBullet bullet) => pool.Release(bullet);
+    private List<Bullet> bullets;
+    private RenderParams renderParams;
 
-    private void Initialize() {
+    public void Spawn(Vector3 position, Vector3 velocity) => bullets.Add(new(position, velocity, lifetime));
 
-        pool = new(
-            createFunc:         OnPoolCreate,
-            actionOnRelease:    OnPoolRelease,
-            actionOnDestroy:    OnPoolDestroy);
-
-        UnityEngine.SceneManagement.SceneManager.activeSceneChanged += (s1, s2) => pool.Clear();
-
-        heirarchyFolder = new GameObject(name).transform;
+    public void Initialize() {
+        bullets = new();
+        renderParams = new(bulletMaterial);
     }
 
-    private IBullet OnPoolCreate() {
+    public void UpdateBullets(Player player) {
 
-        var bullet = Instantiate(bulletPrefab, heirarchyFolder).GetComponent<IBullet>();
-        bullet.OnDeactivate += pool.Release;
+        if (bullets.Count == 0) return;
 
-        return bullet;
-    }
+        var playerBounds = player.Bounds;
+        Vector3 bulletSize = Vector3.one * radius;
+        var cameraRotation = player.Camera.transform.rotation;
 
-    private void OnPoolRelease(IBullet bullet) {
-        bullet.gameObject.SetActive(false);
-    }
+        for (int i = 0; i < bullets.Count; i++) {
 
-    private void OnPoolDestroy(IBullet bullet) {
-        Destroy(bullet.gameObject);
+            var bullet = bullets[i];
+            bullet.position += bullet.velocity * Time.deltaTime;
+            bullet.lifetime -= Time.deltaTime;
+            bullets[i] = bullet;
+
+            if (playerBounds.Intersects(new(bullet.position, bulletSize)))
+                player.TakeDamage(new() {
+                    damage = damage
+                });
+        }
+
+        if (sort) {
+            Vector3 camera = player.Camera.transform.position;
+            int Distance(Bullet b1, Bullet b2) => (int)((b2.position - camera).sqrMagnitude - (b1.position - camera).sqrMagnitude);
+            bullets.Sort(Distance);
+        }
+
+        var instanceData = new Matrix4x4[bullets.Count];
+        for (int i = 0; i < bullets.Count; i++)
+            instanceData[i] = Matrix4x4.TRS(bullets[i].position, cameraRotation, Vector3.one);
+
+        static bool Dead(Bullet bullet) => bullet.lifetime <= 0;
+        bullets.RemoveAll(Dead);
+
+        Graphics.RenderMeshInstanced(renderParams, bulletMesh, 0, instanceData);
     }
 }

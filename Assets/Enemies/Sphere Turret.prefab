@@ -185,9 +185,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0102ed175f4d141e694b0c92ab8bad37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 2
+  fireRate: 1
   fireSpeed: 5
-  bulletsPerAxis: 10
+  turnSpeed: 45
+  bulletsPerAxis: 25
   bulletOrigin: {fileID: 7946599574637651129}
   bulletPool: {fileID: 11400000, guid: 14bca635c57e7492ea28c6337296e110, type: 2}
 --- !u!1 &3223947054756901180

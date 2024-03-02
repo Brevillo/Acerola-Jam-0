@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fccc287850b6447a9b8332430e7ec42f, type: 3}
   m_Name: Basic Bullet Pool
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 8307355667445567344, guid: ad46a97161bdd4b03985bdeebca27a61,
-    type: 3}
+  damage: 1
+  radius: 1
+  lifetime: 5
+  bulletMaterial: {fileID: 2100000, guid: 71ca171563a0a46d1a62d412f0724e1a, type: 2}
+  bulletMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  sort: 1

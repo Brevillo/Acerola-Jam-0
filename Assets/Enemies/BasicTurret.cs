@@ -22,7 +22,7 @@ public class BasicTurret : MonoBehaviour {
 
         if (fireTimer > fireRate) {
             fireTimer = 0;
-            bulletPool.Spawn(bulletOrigin.position).Velocity = (target.position - bulletOrigin.position).normalized * fireSpeed;
+            bulletPool.Spawn(bulletOrigin.position, (target.position - bulletOrigin.position).normalized * fireSpeed);
         }
     }
 }

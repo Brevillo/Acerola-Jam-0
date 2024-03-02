@@ -68,7 +68,6 @@ public class TrailManager : MonoBehaviour {
     }
 
     #region Editor
-    #if UNITY_EDITOR
 
     private void OnDrawGizmos() {
 
@@ -108,6 +107,7 @@ public class TrailManager : MonoBehaviour {
         Gizmos.DrawSphere(member.transform.position, memberGizmoRadius);
     }
 
+    #if UNITY_EDITOR
 
     [CustomEditor(typeof(TrailManager))]
     private class TrailManagerEditor : Editor {
@@ -116,5 +116,6 @@ public class TrailManager : MonoBehaviour {
     }
 
     #endif
+
     #endregion
 }

@@ -4,30 +4,21 @@ using UnityEngine;
 
 public class BasicBullet : IBullet {
 
-    [SerializeField] private float damage;
     [SerializeField] private float lifetime;
 
     private float lifetimer;
 
-    private void Update() {
+    public override void Spawn(Vector3 position) {
+        base.Spawn(position);
+        lifetimer = 0;
+    }
+
+    protected override void Update() {
+
+        base.Update();
 
         lifetimer += Time.deltaTime;
 
         if (lifetimer > lifetime) Destroy();
-    }
-
-    private void OnTriggerEnter(Collider other) {
-
-        if (other.TryGetComponent(out Player player)) {
-
-            player.TakeDamage(new() {
-                damage = damage
-            });
-
-            Destroy();
-        }
-
-        else if (other.gameObject.layer == GameInfo.GroundLayer)
-            Destroy();
     }
 }
