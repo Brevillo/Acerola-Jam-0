@@ -188,7 +188,7 @@ MonoBehaviour:
   fireRate: 1
   fireSpeed: 5
   turnSpeed: 45
-  bulletsPerAxis: 25
+  bulletsPerAxis: 20
   bulletOrigin: {fileID: 7946599574637651129}
   bulletPool: {fileID: 11400000, guid: 14bca635c57e7492ea28c6337296e110, type: 2}
 --- !u!1 &3223947054756901180

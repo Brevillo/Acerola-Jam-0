@@ -10,7 +10,7 @@ public class BulletPool : ScriptableObject {
     [SerializeField] private float lifetime;
     [SerializeField] private Material bulletMaterial;
     [SerializeField] private Mesh bulletMesh;
-    [SerializeField] private bool sort;
+    [SerializeField] private int count;
 
     private struct Bullet {
 
@@ -37,11 +37,14 @@ public class BulletPool : ScriptableObject {
 
     public void UpdateBullets(Player player) {
 
+        count = Mathf.Max(bullets.Count, count);
+
         if (bullets.Count == 0) return;
+
+        // update bullets and check for collision with player
 
         var playerBounds = player.Bounds;
         Vector3 bulletSize = Vector3.one * radius;
-        var cameraRotation = player.Camera.transform.rotation;
 
         for (int i = 0; i < bullets.Count; i++) {
 
@@ -50,24 +53,36 @@ public class BulletPool : ScriptableObject {
             bullet.lifetime -= Time.deltaTime;
             bullets[i] = bullet;
 
-            if (playerBounds.Intersects(new(bullet.position, bulletSize)))
+            if (playerBounds.Intersects(new(bullet.position, bulletSize))) {
+
                 player.TakeDamage(new() {
                     damage = damage
                 });
+
+                bullets.RemoveAt(i);
+                i--;
+            }
         }
 
-        if (sort) {
-            Vector3 camera = player.Camera.transform.position;
-            int Distance(Bullet b1, Bullet b2) => (int)((b2.position - camera).sqrMagnitude - (b1.position - camera).sqrMagnitude);
-            bullets.Sort(Distance);
-        }
-
-        var instanceData = new Matrix4x4[bullets.Count];
-        for (int i = 0; i < bullets.Count; i++)
-            instanceData[i] = Matrix4x4.TRS(bullets[i].position, cameraRotation, Vector3.one);
+        // remove dead bullets
 
         static bool Dead(Bullet bullet) => bullet.lifetime <= 0;
         bullets.RemoveAll(Dead);
+
+        // sort by distance to camera
+
+        Vector3 camera = player.Camera.transform.position;
+        int Distance(Bullet b1, Bullet b2) => (int)((b2.position - camera).sqrMagnitude - (b1.position - camera).sqrMagnitude);
+        bullets.Sort(Distance);
+
+        // generate bullet position/rotation matrices
+
+        var instanceData = new Matrix4x4[bullets.Count];
+        var cameraRotation = player.Camera.transform.rotation;
+        for (int i = 0; i < bullets.Count; i++)
+            instanceData[i] = Matrix4x4.TRS(bullets[i].position, cameraRotation, Vector3.one);
+
+        // render bullets
 
         Graphics.RenderMeshInstanced(renderParams, bulletMesh, 0, instanceData);
     }

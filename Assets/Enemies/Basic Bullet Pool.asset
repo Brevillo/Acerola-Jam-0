@@ -17,4 +17,4 @@ MonoBehaviour:
   lifetime: 5
   bulletMaterial: {fileID: 2100000, guid: 71ca171563a0a46d1a62d412f0724e1a, type: 2}
   bulletMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  sort: 1
+  count: 4400
