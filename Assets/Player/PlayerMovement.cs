@@ -6,6 +6,7 @@ using OliverBeebe.UnityUtilities.Runtime;
 public class PlayerMovement : Player.Component {
 
     [Header("Running")]
+    [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
     [SerializeField] private float groundAccel;
     [SerializeField] private float groundDeccel;
@@ -145,12 +146,14 @@ public class PlayerMovement : Player.Component {
 
     private Vector3 Run(Vector3 velocity, bool keepMomentum) {
 
+        float baseSpeed = Input.Run.Pressed ? runSpeed : walkSpeed;
+
         (float accel, float deccel) = onGround
             ? (groundAccel, groundDeccel)
             : (airAccel, airDeccel);
 
         Vector2 input = Input.Movement.Vector,//.normalized,
-                speed = keepMomentum ? new(Mathf.Max(Mathf.Abs(LocalVelocity.x), runSpeed), Mathf.Max(Mathf.Abs(LocalVelocity.z), runSpeed)) : Vector2.one * runSpeed;
+                speed = keepMomentum ? new(Mathf.Max(Mathf.Abs(LocalVelocity.x), baseSpeed), Mathf.Max(Mathf.Abs(LocalVelocity.z), baseSpeed)) : Vector2.one * baseSpeed;
 
         velocity.x = Mathf.MoveTowards(velocity.x, input.x * speed.x, (input.x != 0 ? accel : deccel) * Time.deltaTime);
         velocity.z = Mathf.MoveTowards(velocity.z, input.y * speed.y, (input.y != 0 ? accel : deccel) * Time.deltaTime);

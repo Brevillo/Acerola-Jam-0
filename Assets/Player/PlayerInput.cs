@@ -9,6 +9,7 @@ public class PlayerInput : InputManager {
     public Button Jump;
     public Button Crouch;
     public Button Dash;
+    public Button Run;
     public Axis Movement;
     public Axis Looking;
 

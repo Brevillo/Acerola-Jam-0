@@ -1443,6 +1443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 5363517435349361648}
+  walkSpeed: 4
   runSpeed: 12
   groundAccel: 200
   groundDeccel: 200
@@ -1556,6 +1557,13 @@ MonoBehaviour:
     released: 0
   Dash:
     actionReference: {fileID: -390151174755788779, guid: 94e3d38f855324190b28318ed00f3f40,
+      type: 3}
+    Enabled: 1
+    pressed: 0
+    down: 0
+    released: 0
+  Run:
+    actionReference: {fileID: 5654425774345872647, guid: 94e3d38f855324190b28318ed00f3f40,
       type: 3}
     Enabled: 1
     pressed: 0
