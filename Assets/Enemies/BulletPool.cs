@@ -9,6 +9,7 @@ public class BulletPool : ScriptableObject {
     [SerializeField] private float radius;
     [SerializeField] private float lifetime;
     [SerializeField] private Material bulletMaterial;
+    [SerializeField] private AnimationCurve sizeOverLifetime;
     [SerializeField] private Mesh bulletMesh;
     [SerializeField] private int count;
 
@@ -72,7 +73,7 @@ public class BulletPool : ScriptableObject {
         // sort by distance to camera
 
         Vector3 camera = player.Camera.transform.position;
-        int Distance(Bullet b1, Bullet b2) => (int)((b2.position - camera).sqrMagnitude - (b1.position - camera).sqrMagnitude);
+        int Distance(Bullet b1, Bullet b2) => (b1.position - camera).sqrMagnitude.CompareTo((b1.position - camera).sqrMagnitude);
         bullets.Sort(Distance);
 
         // generate bullet position/rotation matrices
@@ -80,7 +81,7 @@ public class BulletPool : ScriptableObject {
         var instanceData = new Matrix4x4[bullets.Count];
         var cameraRotation = player.Camera.transform.rotation;
         for (int i = 0; i < bullets.Count; i++)
-            instanceData[i] = Matrix4x4.TRS(bullets[i].position, cameraRotation, Vector3.one);
+            instanceData[i] = Matrix4x4.TRS(bullets[i].position, cameraRotation, Vector3.one * sizeOverLifetime.Evaluate(1 - bullets[i].lifetime / lifetime));
 
         // render bullets
 

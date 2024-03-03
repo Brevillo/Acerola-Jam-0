@@ -8,6 +8,7 @@ public class SphereTurret : MonoBehaviour {
     [SerializeField] private float fireSpeed;
     [SerializeField] private float turnSpeed;
     [SerializeField] private int bulletsPerAxis;
+    [SerializeField] private float verticalArc;
     [SerializeField] private Transform bulletOrigin;
     [SerializeField] private BulletPool bulletPool;
 
@@ -25,11 +26,11 @@ public class SphereTurret : MonoBehaviour {
 
             float increment = 360f / bulletsPerAxis;
 
-            for (int x = 0; x < bulletsPerAxis; x++)
+            //for (int x = 0; x < bulletsPerAxis; x++)
                 for (int y = 0; y < bulletsPerAxis; y++)
                     bulletPool.Spawn(
                         bulletOrigin.position,
-                        Quaternion.Euler(x * increment, y * increment + turn, 0) * Vector3.forward * fireSpeed);
+                        Quaternion.Euler(0/*x * increment*/, y * increment + turn, 0) * Vector3.forward * fireSpeed);
         }
     }
 }
