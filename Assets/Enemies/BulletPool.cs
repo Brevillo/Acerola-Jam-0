@@ -11,7 +11,6 @@ public class BulletPool : ScriptableObject {
     [SerializeField] private Material bulletMaterial;
     [SerializeField] private AnimationCurve sizeOverLifetime;
     [SerializeField] private Mesh bulletMesh;
-    [SerializeField] private int count;
 
     private struct Bullet {
 
@@ -37,8 +36,6 @@ public class BulletPool : ScriptableObject {
     }
 
     public void UpdateBullets(Player player) {
-
-        count = Mathf.Max(bullets.Count, count);
 
         if (bullets.Count == 0) return;
 
