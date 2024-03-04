@@ -188,6 +188,36 @@ MonoBehaviour:
   fireRate: 2
   fireSpeed: 1
   turnSpeed: 45
+  bulletParameters:
+    damage: 1
+    radius: 0.5
+    lifetime: 20
+    sizeOverLifeTime:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.9889641
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: -17.729382
+        outSlope: -17.729382
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.036764845
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  prewarmDuration: 20
+  prewarmDeltaTime: 0.5
   bulletsPerAxis: 30
   verticalArc: 0
   bulletOrigin: {fileID: 7946599574637651129}

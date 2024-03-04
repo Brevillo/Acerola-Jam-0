@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Basic Bullet Pool
   m_EditorClassIdentifier: 
   damage: 1
-  radius: 1
+  radius: 0.5
   lifetime: 20
   bulletMaterial: {fileID: 2100000, guid: 71ca171563a0a46d1a62d412f0724e1a, type: 2}
   sizeOverLifetime:
@@ -41,4 +41,3 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   bulletMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  count: 14000

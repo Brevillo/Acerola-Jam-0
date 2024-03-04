@@ -5,72 +5,124 @@ using UnityEngine;
 [CreateAssetMenu]
 public class BulletPool : ScriptableObject {
 
-    [SerializeField] private float damage;
-    [SerializeField] private float radius;
-    [SerializeField] private float lifetime;
     [SerializeField] private Material bulletMaterial;
-    [SerializeField] private AnimationCurve sizeOverLifetime;
     [SerializeField] private Mesh bulletMesh;
 
-    private struct Bullet {
+    [System.Serializable]
+    public struct BulletParameters {
+        public float damage;
+        public float radius;
+        public float lifetime;
+        public AnimationCurve sizeOverLifeTime;
+    }
+
+    public struct Bullet {
 
         public Vector3 position;
+        public Vector3 initialVelocity;
         public Vector3 velocity;
+        public float size;
         public float lifetime;
         
         public Bullet(Vector3 position, Vector3 velocity, float lifetime) {
             this.position = position;
-            this.velocity = velocity;
+            initialVelocity = this.velocity = velocity;
             this.lifetime = lifetime;
+            this.size = default;
         }
     }
 
-    private List<Bullet> bullets;
-    private RenderParams renderParams;
+    public class BulletRegister {
 
-    public void Spawn(Vector3 position, Vector3 velocity) => bullets.Add(new(position, velocity, lifetime));
+        public BulletRegister(BulletParameters parameters) {
+            this.parameters = parameters;
+        }
 
-    public void Initialize() {
-        bullets = new();
-        renderParams = new(bulletMaterial);
-    }
+        public List<Bullet> bullets = new();
+        private BulletParameters parameters;
 
-    public void UpdateBullets(Player player) {
+        public void Spawn(Vector3 position, Vector3 velocity) => bullets.Add(new(position, velocity, parameters.lifetime));
 
-        if (bullets.Count == 0) return;
+        public void Update(float deltaTime) {
 
-        // update bullets and check for collision with player
+            for (int i = 0; i < bullets.Count; i++) {
 
-        var playerBounds = player.Bounds;
-        Vector3 bulletSize = Vector3.one * radius;
+                var bullet = bullets[i];
 
-        for (int i = 0; i < bullets.Count; i++) {
+                if (Physics.Raycast(bullet.position, Vector3.down, out var hit, Mathf.Infinity, GameInfo.GroundMask))
+                    bullet.velocity = Quaternion.FromToRotation(Vector3.up, hit.normal) * bullet.initialVelocity;
 
-            var bullet = bullets[i];
-            bullet.position += bullet.velocity * Time.deltaTime;
-            bullet.lifetime -= Time.deltaTime;
-            bullets[i] = bullet;
+                bullet.position += bullet.velocity * deltaTime;
+                bullet.lifetime -= deltaTime;
+                bullet.size = parameters.sizeOverLifeTime.Evaluate(1 - bullets[i].lifetime / parameters.lifetime);
 
-            if (playerBounds.Intersects(new(bullet.position, bulletSize))) {
+                bullets[i] = bullet;
 
-                player.TakeDamage(new() {
-                    damage = damage
-                });
-
-                bullets.RemoveAt(i);
-                i--;
+                if (bullet.lifetime <= 0) {
+                    bullets.RemoveAt(i);
+                    i--;
+                }
             }
         }
 
-        // remove dead bullets
+        public void CheckCollisions(Player player) {
 
-        static bool Dead(Bullet bullet) => bullet.lifetime <= 0;
-        bullets.RemoveAll(Dead);
+            Bounds bounds = player.Bounds;
+            Vector3 size = Vector3.one * parameters.radius;
+
+            foreach (var bullet in bullets.FindAll(bullet => bounds.Intersects(new(bullet.position, size)))) {
+
+                player.TakeDamage(new() {
+                    damage = parameters.damage
+                });
+
+                bullets.Remove(bullet);
+            }
+        }
+
+        public void Prewarm(float duration, float deltaTime, System.Action<float> updateFunction) {
+
+            for (float time = 0; time < duration; time += deltaTime) {
+                updateFunction.Invoke(deltaTime);
+                Update(deltaTime);
+            }
+        }
+    }
+
+    private List<BulletRegister> registers = new();
+
+    public BulletRegister Register(BulletParameters parameters) {
+
+        var register = new BulletRegister(parameters);
+
+        registers.Add(register);
+
+        return register;
+    }
+
+    public void Deregister(BulletRegister register) {
+        registers.Remove(register);
+    }
+
+    public void UpdateBullets(Player player, float deltaTime) {
+
+        foreach (var register in registers) {
+            register.Update(deltaTime);
+            register.CheckCollisions(player);
+        }
+    }
+
+    public void RenderBullets(Player player) {
+
+        List<Bullet> bullets = new();
+
+        foreach (var register in registers)
+            bullets.AddRange(register.bullets);
 
         // sort by distance to camera
 
         Vector3 camera = player.Camera.transform.position;
-        int Distance(Bullet b1, Bullet b2) => (b1.position - camera).sqrMagnitude.CompareTo((b1.position - camera).sqrMagnitude);
+        int Distance(Bullet b1, Bullet b2) => (b2.position - camera).sqrMagnitude.CompareTo((b1.position - camera).sqrMagnitude);
         bullets.Sort(Distance);
 
         // generate bullet position/rotation matrices
@@ -78,10 +130,10 @@ public class BulletPool : ScriptableObject {
         var instanceData = new Matrix4x4[bullets.Count];
         var cameraRotation = player.Camera.transform.rotation;
         for (int i = 0; i < bullets.Count; i++)
-            instanceData[i] = Matrix4x4.TRS(bullets[i].position, cameraRotation, Vector3.one * sizeOverLifetime.Evaluate(1 - bullets[i].lifetime / lifetime));
+            instanceData[i] = Matrix4x4.TRS(bullets[i].position, cameraRotation, Vector3.one * bullets[i].size);
 
         // render bullets
 
-        Graphics.RenderMeshInstanced(renderParams, bulletMesh, 0, instanceData);
+        Graphics.RenderMeshInstanced(new(bulletMaterial), bulletMesh, 0, instanceData);
     }
 }

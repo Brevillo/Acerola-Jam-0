@@ -17,6 +17,8 @@ public class TrailManager : MonoBehaviour {
     [SerializeField] private float trailFadeWidth;
     [SerializeField] private AnimationCurve trailFadeCurve;
     [SerializeField] private float minFog, maxFog;
+    [SerializeField] private float maxChromaticAbberation;
+    [SerializeField] private VolumeProfile postProcessing;
 
     [Header("Debug Line Renderers")]
     [SerializeField] private float debugLineHeight;
@@ -166,6 +168,16 @@ public class TrailManager : MonoBehaviour {
 
         trail.DebugTrailEnabled = showDebugTrail;
 
+        float trailPercent = CalculatePlayerTrailPercent();
+
+        RenderSettings.fogDensity = Mathf.Lerp(minFog, maxFog, trailPercent);
+
+        if (postProcessing.TryGet(out ChromaticAberration chromaticAberration))
+            chromaticAberration.intensity.value = Mathf.Lerp(0, maxChromaticAbberation, trailPercent);
+    }
+
+    private float CalculatePlayerTrailPercent() {
+
         Vector2 player = new(target.position.x, target.position.z);
 
         (TrailMember m1, TrailMember m2) closestSegment = default;
@@ -205,9 +217,9 @@ public class TrailManager : MonoBehaviour {
         float linePerecnt = Util.InverseLerpFromClosestPoint(player, position1, position2),
               lineWidth   = Mathf.Lerp(member1.Width, member2.Width, linePerecnt),
               distToLine  = Util.DistToLine(player, position1, position2).magnitude,
-              fadePercent = trailFadeCurve.Evaluate((lineWidth / 2f - distToLine) / trailFadeWidth);
+              fadePercent = 1 - trailFadeCurve.Evaluate((lineWidth / 2f - distToLine) / trailFadeWidth);
 
-        RenderSettings.fogDensity = Mathf.Lerp(minFog, maxFog, fadePercent);
+        return fadePercent;
     }
 
     private void DestroyTrail() {

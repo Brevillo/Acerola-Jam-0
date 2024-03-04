@@ -23,4 +23,8 @@ public class DebugCanvas : Player.Component {
     public void ToggleDebugTrail() {
         TrailManager.showDebugTrail = !TrailManager.showDebugTrail;
     }
+
+    public void ToggleGodemode() {
+        PlayerMovement.godmode = !PlayerMovement.godmode;
+    }
 }

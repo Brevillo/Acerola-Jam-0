@@ -10,14 +10,17 @@ public class BulletPoolManager : MonoBehaviour {
 
     private void Start() {
         player = FindObjectOfType<Player>();
-
-        foreach (var pool in pools)
-            pool.Initialize();
     }
 
-    private void Update() {
+    private void FixedUpdate() {
 
         foreach (var pool in pools)
-            pool.UpdateBullets(player);
+            pool.UpdateBullets(player, Time.fixedDeltaTime);
+    }
+
+    private void LateUpdate() {
+
+        foreach (var pool in pools)
+            pool.RenderBullets(player);
     }
 }

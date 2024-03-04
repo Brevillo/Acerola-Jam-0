@@ -6,14 +6,21 @@ public class BasicTurret : MonoBehaviour {
 
     [SerializeField] private float fireRate;
     [SerializeField] private float fireSpeed;
+    [SerializeField] private BulletPool.BulletParameters parameters;
     [SerializeField] private Transform bulletOrigin;
     [SerializeField] private BulletPool bulletPool;
 
     private float fireTimer;
     private Transform target;
+    private BulletPool.BulletRegister bulletRegister;
 
     private void Start() {
         target = FindObjectOfType<Player>().transform;
+        bulletRegister = bulletPool.Register(parameters);
+    }
+
+    private void OnDestroy() {
+        bulletPool.Deregister(bulletRegister);
     }
 
     private void Update() {
@@ -22,7 +29,7 @@ public class BasicTurret : MonoBehaviour {
 
         if (fireTimer > fireRate) {
             fireTimer = 0;
-            bulletPool.Spawn(bulletOrigin.position, (target.position - bulletOrigin.position).normalized * fireSpeed);
+            bulletRegister.Spawn(bulletOrigin.position, (target.position - bulletOrigin.position).normalized * fireSpeed);
         }
     }
 }

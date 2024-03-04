@@ -5,6 +5,8 @@ using OliverBeebe.UnityUtilities.Runtime;
 
 public class PlayerMovement : Player.Component {
 
+    #region Parameters
+
     [Header("Running")]
     [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
@@ -37,6 +39,8 @@ public class PlayerMovement : Player.Component {
     [SerializeField] private Vector2 lookSpeed;
     [SerializeField] private Transform cameraPivot;
 
+    #endregion
+
     private StateMachine<PlayerMovement> stateMachine;
     private Grounded grounded;
     private Jumping jumping;
@@ -47,6 +51,8 @@ public class PlayerMovement : Player.Component {
     private bool jumpBuffered;
 
     private float jumpTilt, jumpTiltVelocity;
+
+    public static bool godmode;
 
     [System.Serializable]
     private class EffectBlend {
@@ -113,7 +119,13 @@ public class PlayerMovement : Player.Component {
 
         jumpBuffered = jumpBuffer.Buffer(Input.Jump.Down);
 
-        stateMachine.Update(Time.deltaTime);
+        Collider.enabled = !godmode;
+        if (godmode) {
+            Vector3 input = new Vector3(Input.Movement.Vector.x, (Input.Jump.Pressed ? 1 : 0) - (Input.Crouch.Pressed ? 1 : 0), Input.Movement.Vector.y);
+            Rigidbody.velocity = transform.TransformDirection(input) * 50f;
+        }
+        else
+            stateMachine.Update(Time.deltaTime);
 
         // camera effects
 
@@ -125,7 +137,7 @@ public class PlayerMovement : Player.Component {
         cameraPositionBob.SetTimer(Time.time);
         cameraRotationBob.SetTimer(Time.time);
 
-        Vector3 velocityPercent = LocalVelocity / runSpeed;
+        Vector3 velocityPercent = SlopeVelocity / runSpeed;
         float movePercent = Mathf.Max(Mathf.Abs(velocityPercent.x), Mathf.Abs(velocityPercent.z)) * cameraBobPercent;
         cameraEffectsPivot.localPosition += (Vector3)cameraPositionBob.position * movePercent;
         cameraEffectsPivot.localEulerAngles += cameraRotationBob.position * movePercent;
@@ -153,7 +165,9 @@ public class PlayerMovement : Player.Component {
             : (airAccel, airDeccel);
 
         Vector2 input = Input.Movement.Vector,//.normalized,
-                speed = keepMomentum ? new(Mathf.Max(Mathf.Abs(LocalVelocity.x), baseSpeed), Mathf.Max(Mathf.Abs(LocalVelocity.z), baseSpeed)) : Vector2.one * baseSpeed;
+                speed = keepMomentum && Input.Run.Pressed
+                    ? new(Mathf.Max(Mathf.Abs(LocalVelocity.x), baseSpeed), Mathf.Max(Mathf.Abs(LocalVelocity.z), baseSpeed))
+                    : Vector2.one * baseSpeed;
 
         velocity.x = Mathf.MoveTowards(velocity.x, input.x * speed.x, (input.x != 0 ? accel : deccel) * Time.deltaTime);
         velocity.z = Mathf.MoveTowards(velocity.z, input.y * speed.y, (input.y != 0 ? accel : deccel) * Time.deltaTime);
