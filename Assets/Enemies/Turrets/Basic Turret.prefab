@@ -148,6 +148,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5216871310467539659}
   - component: {fileID: -9189119145861001038}
+  - component: {fileID: 5910309814558305891}
   m_Layer: 0
   m_Name: Basic Turret
   m_TagString: Untagged
@@ -188,7 +189,33 @@ MonoBehaviour:
   fireRate: 0.1
   fireSpeed: 5
   bulletOrigin: {fileID: 7946599574637651129}
-  bulletPool: {fileID: 11400000, guid: 14bca635c57e7492ea28c6337296e110, type: 2}
+  spawner: {fileID: 0}
+--- !u!114 &5910309814558305891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362877186699420738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f54bddc6f867f4fcabc9f3c76b9d71ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parameters:
+    damage: 0
+    radius: 0
+    lifetime: 0
+    followGround: 0
+    sizeOverLifeTime:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  prewarmDuration: 0
+  prewarmDeltaTime: 0
+  pool: {fileID: 11400000, guid: 14bca635c57e7492ea28c6337296e110, type: 2}
 --- !u!1 &3223947054756901180
 GameObject:
   m_ObjectHideFlags: 0

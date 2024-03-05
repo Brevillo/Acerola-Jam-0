@@ -8,11 +8,17 @@ public class BulletPool : ScriptableObject {
     [SerializeField] private Material bulletMaterial;
     [SerializeField] private Mesh bulletMesh;
 
+    public static float timeScale = 1;
+
     [System.Serializable]
     public struct BulletParameters {
+
         public float damage;
         public float radius;
         public float lifetime;
+
+        public bool followGround;
+
         public AnimationCurve sizeOverLifeTime;
     }
 
@@ -26,7 +32,8 @@ public class BulletPool : ScriptableObject {
         
         public Bullet(Vector3 position, Vector3 velocity, float lifetime) {
             this.position = position;
-            initialVelocity = this.velocity = velocity;
+            this.initialVelocity = velocity;
+            this.velocity = velocity;
             this.lifetime = lifetime;
             this.size = default;
         }
@@ -49,7 +56,7 @@ public class BulletPool : ScriptableObject {
 
                 var bullet = bullets[i];
 
-                if (Physics.Raycast(bullet.position, Vector3.down, out var hit, Mathf.Infinity, GameInfo.GroundMask))
+                if (parameters.followGround && Physics.Raycast(bullet.position, Vector3.down, out var hit, Mathf.Infinity, GameInfo.GroundMask))
                     bullet.velocity = Quaternion.FromToRotation(Vector3.up, hit.normal) * bullet.initialVelocity;
 
                 bullet.position += bullet.velocity * deltaTime;
@@ -105,6 +112,8 @@ public class BulletPool : ScriptableObject {
     }
 
     public void UpdateBullets(Player player, float deltaTime) {
+
+        deltaTime *= timeScale;
 
         foreach (var register in registers) {
             register.Update(deltaTime);

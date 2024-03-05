@@ -15,6 +15,8 @@ public class Player : MonoBehaviour {
     public Bounds Bounds => collider.bounds;
     public Camera Camera => camera;
 
+    private Dictionary<Component, bool> cursorShow = new();
+
     public void TakeDamage(PlayerDamageInfo info) => health.TakeDamage(info);
 
     public class Component : MonoBehaviour {
@@ -27,5 +29,23 @@ public class Player : MonoBehaviour {
 
         protected Rigidbody         Rigidbody   => player.rigidbody;
         protected CapsuleCollider   Collider    => player.collider;
+
+        protected bool ShowCursor {
+
+            get {
+                bool shown = false;
+                foreach (var show in player.cursorShow.Values) shown |= show;
+                return shown;
+            }
+
+            set {
+
+                if (!player.cursorShow.TryAdd(this, value))
+                    player.cursorShow[this] = value;
+
+                Cursor.lockState = ShowCursor ? CursorLockMode.None : CursorLockMode.Locked;
+                Cursor.visible = ShowCursor;
+            }
+        }
     }
 }

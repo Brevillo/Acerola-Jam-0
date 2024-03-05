@@ -148,6 +148,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5216871310467539659}
   - component: {fileID: 5155484389969244383}
+  - component: {fileID: 8099536588221347573}
   m_Layer: 0
   m_Name: Sphere Turret
   m_TagString: Untagged
@@ -188,40 +189,53 @@ MonoBehaviour:
   fireRate: 2
   fireSpeed: 1
   turnSpeed: 45
-  bulletParameters:
+  bulletsPerAxis: 30
+  bulletOrigin: {fileID: 7946599574637651129}
+  spawner: {fileID: 8099536588221347573}
+--- !u!114 &8099536588221347573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362877186699420738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f54bddc6f867f4fcabc9f3c76b9d71ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parameters:
     damage: 1
     radius: 0.5
-    lifetime: 20
+    lifetime: 10
+    followGround: 1
     sizeOverLifeTime:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.9889641
+        time: 0.98
         value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
+        inSlope: -50.00005
+        outSlope: -50.00005
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0
-        outWeight: 0
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
         value: 0
-        inSlope: -17.729382
-        outSlope: -17.729382
-        tangentMode: 0
+        inSlope: -50.00005
+        outSlope: -50.00005
+        tangentMode: 34
         weightedMode: 0
-        inWeight: 0.036764845
+        inWeight: 0.33333334
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  prewarmDuration: 20
-  prewarmDeltaTime: 0.5
-  bulletsPerAxis: 30
-  verticalArc: 0
-  bulletOrigin: {fileID: 7946599574637651129}
-  bulletPool: {fileID: 11400000, guid: 14bca635c57e7492ea28c6337296e110, type: 2}
+  prewarmDuration: 100
+  prewarmDeltaTime: 1
+  pool: {fileID: 11400000, guid: 14bca635c57e7492ea28c6337296e110, type: 2}
 --- !u!1 &3223947054756901180
 GameObject:
   m_ObjectHideFlags: 0

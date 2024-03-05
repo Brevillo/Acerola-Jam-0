@@ -13,6 +13,9 @@ public class PlayerInput : InputManager {
     public Axis Movement;
     public Axis Looking;
 
+    [Header("UI")]
+    public Button Pause;
+
     [Header("Debuggin")]
     public Button Debug;
 }

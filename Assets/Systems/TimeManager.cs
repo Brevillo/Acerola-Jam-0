@@ -15,7 +15,12 @@ public static class TimeManager {
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void ResetTimeScale() => timeScale = 1f;
+    private static void Setup() {
+
+        timeScale = 1f;
+
+        UnityEngine.SceneManagement.SceneManager.activeSceneChanged += (from, to) => timeScale = 1f;
+    }
 
     private static readonly List<TimeFreeze> timeFreezes = new();
 

@@ -29,6 +29,7 @@ public class TrailManager : MonoBehaviour {
 
     private Transform target;
 
+    public static bool trailEffectsActive = true;
     public static bool showDebugTrail;
 
     [System.Serializable]
@@ -168,12 +169,13 @@ public class TrailManager : MonoBehaviour {
 
         trail.DebugTrailEnabled = showDebugTrail;
 
-        float trailPercent = CalculatePlayerTrailPercent();
+        float trailPercent = CalculatePlayerTrailPercent(),
+              effectsPercent = trailEffectsActive ? trailPercent : 0;
 
-        RenderSettings.fogDensity = Mathf.Lerp(minFog, maxFog, trailPercent);
+        RenderSettings.fogDensity = Mathf.Lerp(minFog, maxFog, effectsPercent);
 
         if (postProcessing.TryGet(out ChromaticAberration chromaticAberration))
-            chromaticAberration.intensity.value = Mathf.Lerp(0, maxChromaticAbberation, trailPercent);
+            chromaticAberration.intensity.value = Mathf.Lerp(0, maxChromaticAbberation, effectsPercent);
     }
 
     private float CalculatePlayerTrailPercent() {

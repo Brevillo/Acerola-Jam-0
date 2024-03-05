@@ -95,18 +95,32 @@ public class PlayerMovement : Player.Component {
 
         Input.Looking.OnUpdated += OnLookUpdated;
 
+        jumpBuffer.Reset();
+
+        cameraRotation = new(cameraPivot.localEulerAngles.x, transform.eulerAngles.y);
+
         OnLookUpdated(Vector2.zero);
+        discardMouseDelta = true;
     }
 
+    private bool discardMouseDelta;
     private void OnLookUpdated(Vector2 delta) {
 
-        if (this == null || Input.Debug.Pressed) return;
+        if (this == null || ShowCursor) {
+            discardMouseDelta = true;
+            return;
+        }
+
+        if (discardMouseDelta) {
+            discardMouseDelta = false;
+            return;
+        }
 
         cameraRotation.x = Mathf.Clamp(cameraRotation.x - delta.y, -90, 90);
         cameraRotation.y += delta.x;
 
         Rigidbody.MoveRotation(Quaternion.AngleAxis(cameraRotation.y, Vector3.up));
-        cameraPivot.localRotation = Quaternion.AngleAxis(cameraRotation.x, Vector3.right);
+        cameraPivot.localEulerAngles = Vector3.right * cameraRotation.x;
     }
 
     private void Update() {
@@ -183,8 +197,8 @@ public class PlayerMovement : Player.Component {
 
         TransitionDelegate
             toGround    = () => onGround,
-            toJump      = () => onGround && jumpBuffered,
-            coyoteJump  = () => stateMachine.previousState == grounded && stateMachine.stateDuration < coyoteTime,
+            toJump      = () => jumpBuffered && onGround,
+            coyoteJump  = () => jumpBuffered && stateMachine.previousState == grounded && stateMachine.stateDuration < coyoteTime,
             endJump     = () => Velocity.y <= 0,
             toFalling   = () => !onGround;
 
@@ -237,6 +251,8 @@ public class PlayerMovement : Player.Component {
 
             base.Enter();
 
+            context.jumpBuffer.Reset();
+
             Vector3 localVelocity = context.LocalVelocity;
 
             localVelocity.y = Mathf.Sqrt(context.jumpGravity * context.jumpHeight * 2f);
@@ -267,5 +283,12 @@ public class PlayerMovement : Player.Component {
 
             base.Update();
         }
+    }
+
+    private class Sliding : State {
+
+        public Sliding(PlayerMovement context) : base(context) { }
+
+
     }
 }

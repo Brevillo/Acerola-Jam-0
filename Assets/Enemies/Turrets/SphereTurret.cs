@@ -7,29 +7,21 @@ public class SphereTurret : MonoBehaviour {
     [SerializeField] private float fireRate;
     [SerializeField] private float fireSpeed;
     [SerializeField] private float turnSpeed;
-    [SerializeField] private BulletPool.BulletParameters bulletParameters;
-    [SerializeField] private float prewarmDuration, prewarmDeltaTime;
     [SerializeField] private int bulletsPerAxis;
     [SerializeField] private Transform bulletOrigin;
-    [SerializeField] private BulletPool bulletPool;
+    [SerializeField] private BulletSpawner spawner;
 
     private float fireTimer;
     private float turn;
 
-    private BulletPool.BulletRegister bulletRegister;
 
     private void Start() {
-        bulletRegister = bulletPool.Register(bulletParameters);
-        bulletRegister.Prewarm(prewarmDuration, prewarmDeltaTime, AttackUpdate);
+        spawner.Prewarm(AttackUpdate);
     }
 
-    private void OnDestroy() {
-        bulletPool.Deregister(bulletRegister);
-    }
+    private void Update() {
 
-    private void FixedUpdate() {
-
-        AttackUpdate(Time.fixedDeltaTime);
+        AttackUpdate(Time.deltaTime);
     }
 
     private void AttackUpdate(float deltaTime) {
@@ -45,7 +37,7 @@ public class SphereTurret : MonoBehaviour {
             float turnAmount = turn % 360;
 
             for (int y = 0; y < bulletsPerAxis; y++)
-                bulletRegister.Spawn(
+                spawner.Spawn(
                     bulletOrigin.position,
                     Quaternion.Euler(0, y * increment + turnAmount, 0) * Vector3.forward * fireSpeed);
         }
