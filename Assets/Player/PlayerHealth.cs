@@ -76,6 +76,8 @@ public class PlayerHealth : Player.Component {
         reaperTouch.enabled = false;
         damageFlashUI.alpha = 0;
 
+        BulletPool.timeScale = 1;
+
         uiShakes = healthShakingTransforms.ConvertAll(transform => new UIShake(transform, this));
     }
 

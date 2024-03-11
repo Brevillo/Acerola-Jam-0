@@ -23,6 +23,8 @@ public class Player : MonoBehaviour {
 
         [SerializeField] private Player player;
 
+        protected Player Player                 => player;
+
         protected PlayerMovement    Movement    => player.movement;
         protected PlayerHealth      Health      => player.health;
         protected PlayerInput       Input       => player.input;

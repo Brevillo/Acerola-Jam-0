@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using OliverBeebe.UnityUtilities.Runtime;
 
 public class SphereTurret : MonoBehaviour {
 
@@ -10,18 +11,17 @@ public class SphereTurret : MonoBehaviour {
     [SerializeField] private int bulletsPerAxis;
     [SerializeField] private Transform bulletOrigin;
     [SerializeField] private BulletSpawner spawner;
+    [SerializeField] private AudioSource shootSound;
 
     private float fireTimer;
     private float turn;
-
 
     private void Start() {
         spawner.Prewarm(AttackUpdate);
     }
 
     private void Update() {
-
-        AttackUpdate(Time.deltaTime);
+        AttackUpdate(BulletPool.deltaTime);
     }
 
     private void AttackUpdate(float deltaTime) {
@@ -40,6 +40,8 @@ public class SphereTurret : MonoBehaviour {
                 spawner.Spawn(
                     bulletOrigin.position,
                     Quaternion.Euler(0, y * increment + turnAmount, 0) * Vector3.forward * fireSpeed);
+
+            shootSound.Play();
         }
     }
 }

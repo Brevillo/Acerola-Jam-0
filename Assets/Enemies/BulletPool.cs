@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using OliverBeebe.UnityUtilities.Runtime;
 
 [CreateAssetMenu]
 public class BulletPool : ScriptableObject {
 
     [SerializeField] private Material bulletMaterial;
     [SerializeField] private Mesh bulletMesh;
+    [SerializeField, Readonly] private int count;
 
     public static float timeScale = 1;
+    public static float deltaTime => timeScale * Time.deltaTime;
 
     [System.Serializable]
     public struct BulletParameters {
@@ -127,6 +130,8 @@ public class BulletPool : ScriptableObject {
 
         foreach (var register in registers)
             bullets.AddRange(register.bullets);
+
+        count = bullets.Count;
 
         // sort by distance to camera
 

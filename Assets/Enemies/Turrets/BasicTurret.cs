@@ -14,11 +14,16 @@ public class BasicTurret : MonoBehaviour {
 
     private void Start() {
         target = FindObjectOfType<Player>().transform;
+        spawner.Prewarm(AttackUpdate);
     }
 
     private void Update() {
+        AttackUpdate(BulletPool.deltaTime);
+    }
 
-        fireTimer += Time.deltaTime;
+    private void AttackUpdate(float deltaTime) {
+
+        fireTimer += deltaTime;
 
         if (fireTimer > fireRate) {
             fireTimer = 0;

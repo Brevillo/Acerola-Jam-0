@@ -22,14 +22,19 @@ public class PlayerMovement : Player.Component {
 
     [Header("Jumping")]
     [SerializeField] private float jumpHeight;
+    [SerializeField] private float minJumpTime;
     [SerializeField] private float jumpMomentumBoost;
     [SerializeField] private float jumpGravity;
+    [SerializeField] private float jumpExitGravity;
+    [SerializeField] private float jumpPeakGravity;
+    [SerializeField] private float jumpPeakThreshold;
     [SerializeField] private float fallGravity;
     [SerializeField] private float maxFallSpeed;
     [SerializeField] private float coyoteTime;
     [SerializeField] private BufferTimer jumpBuffer;
     [SerializeField] private float jumpTiltMultiple, jumpTiltDampSpeed;
     [SerializeField] private EffectBlend jumpTiltBlend;
+    [SerializeField] private SoundEffect jumpSound;
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheckOrigin;
@@ -116,6 +121,8 @@ public class PlayerMovement : Player.Component {
             return;
         }
 
+        delta *= TimeManager.timeScale;
+
         cameraRotation.x = Mathf.Clamp(cameraRotation.x - delta.y, -90, 90);
         cameraRotation.y += delta.x;
 
@@ -170,21 +177,19 @@ public class PlayerMovement : Player.Component {
         Velocity = velocity;
     }
 
-    private Vector3 Run(Vector3 velocity, bool keepMomentum) {
-
-        float baseSpeed = Input.Run.Pressed ? runSpeed : walkSpeed;
+    private Vector3 Run(Vector3 velocity) {
 
         (float accel, float deccel) = onGround
             ? (groundAccel, groundDeccel)
             : (airAccel, airDeccel);
 
-        Vector2 input = Input.Movement.Vector,//.normalized,
-                speed = keepMomentum && Input.Run.Pressed
-                    ? new(Mathf.Max(Mathf.Abs(LocalVelocity.x), baseSpeed), Mathf.Max(Mathf.Abs(LocalVelocity.z), baseSpeed))
-                    : Vector2.one * baseSpeed;
+        Vector2 input = Input.Movement.Vector,
+                speed = Input.Run.Pressed
+                    ? input * new Vector2(Mathf.Max(Mathf.Abs(LocalVelocity.x), runSpeed), Mathf.Max(Mathf.Abs(LocalVelocity.z), runSpeed))
+                    : input.normalized * walkSpeed;
 
-        velocity.x = Mathf.MoveTowards(velocity.x, input.x * speed.x, (input.x != 0 ? accel : deccel) * Time.deltaTime);
-        velocity.z = Mathf.MoveTowards(velocity.z, input.y * speed.y, (input.y != 0 ? accel : deccel) * Time.deltaTime);
+        velocity.x = Mathf.MoveTowards(velocity.x, speed.x, (input.x != 0 ? accel : deccel) * Time.deltaTime);
+        velocity.z = Mathf.MoveTowards(velocity.z, speed.y, (input.y != 0 ? accel : deccel) * Time.deltaTime);
 
         return velocity;
     }
@@ -196,10 +201,13 @@ public class PlayerMovement : Player.Component {
         falling = new(this);
 
         TransitionDelegate
+
             toGround    = () => onGround,
+
             toJump      = () => jumpBuffered && onGround,
             coyoteJump  = () => jumpBuffered && stateMachine.previousState == grounded && stateMachine.stateDuration < coyoteTime,
             endJump     = () => Velocity.y <= 0,
+
             toFalling   = () => !onGround;
 
         stateMachine = new(
@@ -235,7 +243,7 @@ public class PlayerMovement : Player.Component {
 
         public override void Update() {
 
-            Vector3 slopeVelocity = context.Run(context.SlopeVelocity, false);
+            Vector3 slopeVelocity = context.Run(context.SlopeVelocity);
             slopeVelocity.y = -context.groundSuckForce;
             context.SlopeVelocity = slopeVelocity;
 
@@ -247,11 +255,16 @@ public class PlayerMovement : Player.Component {
 
         public Jumping(PlayerMovement context) : base(context) { }
 
+        private enum State { Waiting, Released, Peaking }
+        private State state;
+
         public override void Enter() {
 
             base.Enter();
 
             context.jumpBuffer.Reset();
+
+            state = State.Waiting;
 
             Vector3 localVelocity = context.LocalVelocity;
 
@@ -261,12 +274,19 @@ public class PlayerMovement : Player.Component {
             localVelocity += new Vector3(boost.x, 0, boost.y);
 
             context.LocalVelocity = localVelocity;
+
+            context.jumpSound.Play(context);
         }
 
         public override void Update() {
 
-            context.LocalVelocity = context.Run(context.LocalVelocity, true);
-            context.Fall(context.jumpGravity);
+            if (state == State.Waiting  && !context.Input.Jump.Pressed) state = State.Released;
+            if (state == State.Released && context.stateMachine.stateDuration > context.minJumpTime) state = State.Peaking;
+            float gravity = state == State.Peaking ? context.jumpExitGravity : context.jumpGravity;
+
+            context.Fall(gravity);
+
+            context.LocalVelocity = context.Run(context.LocalVelocity);
 
             base.Update();
         }
@@ -278,8 +298,12 @@ public class PlayerMovement : Player.Component {
 
         public override void Update() {
 
-            context.LocalVelocity = context.Run(context.LocalVelocity, true);
-            context.Fall(context.fallGravity);
+            float gravity = Mathf.Abs(context.Velocity.y) < context.jumpPeakThreshold
+                ? context.jumpPeakGravity
+                : context.fallGravity;
+
+            context.LocalVelocity = context.Run(context.LocalVelocity);
+            context.Fall(gravity);
 
             base.Update();
         }

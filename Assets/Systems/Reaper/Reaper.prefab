@@ -50,7 +50,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 4098907450452214896}
   spawnRadius: 180
+  groundDetectRadius: 50
   audioSource: {fileID: 191357426686081762}
+  maxSpawnAttempts: 100
 --- !u!195 &4098907450452214896
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -61,7 +63,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.25
-  m_Speed: 30
+  m_Speed: 60
   m_Acceleration: 1000
   avoidancePriority: 50
   m_AngularSpeed: 1000
